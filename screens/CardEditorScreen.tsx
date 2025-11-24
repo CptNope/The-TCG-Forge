@@ -1,9 +1,64 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCards } from '../src/hooks/useCards';
+import { useAppContext } from '../src/context/AppContext';
 
 const CardEditorScreen: React.FC = () => {
   const navigate = useNavigate();
+  const { currentProjectId, currentSetId } = useAppContext();
+  const { createCard } = useCards(currentProjectId || undefined);
+  
   const [activeTab, setActiveTab] = useState('General');
+  const [cardName, setCardName] = useState('');
+  const [cardType, setCardType] = useState('');
+  const [cost, setCost] = useState(0);
+  const [power, setPower] = useState(0);
+  const [health, setHealth] = useState(0);
+  const [abilityText, setAbilityText] = useState('');
+  const [rarity, setRarity] = useState('Common');
+
+  const handleSave = () => {
+    if (!cardName.trim() || !currentProjectId || !currentSetId) {
+      alert('Please fill in at least the card name');
+      return;
+    }
+
+    createCard({
+      projectId: currentProjectId,
+      setId: currentSetId,
+      name: cardName,
+      type: cardType || 'Creature',
+      cost: cost || 0,
+      power: power,
+      health: health,
+      abilityText: abilityText,
+      flavorText: '',
+      artwork: '',
+      rarity: rarity,
+      attributes: {},
+      tags: [],
+    });
+
+    // Show success and go back
+    alert(`Card "${cardName}" created successfully!`);
+    navigate(-1);
+  };
+
+  if (!currentProjectId || !currentSetId) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-500 mb-4">No set selected</p>
+          <button
+            onClick={() => navigate('/sets-grid')}
+            className="px-4 py-2 bg-primary text-white rounded-lg"
+          >
+            Go to Sets
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white overflow-hidden">
@@ -17,7 +72,12 @@ const CardEditorScreen: React.FC = () => {
         </div>
         <h2 className="text-lg font-bold leading-tight flex-1 text-center">Create New Card</h2>
         <div className="flex w-12 items-center justify-end">
-          <button className="text-primary text-base font-bold">Save</button>
+          <button 
+            onClick={handleSave}
+            className="text-primary text-base font-bold hover:text-primary-dark transition-colors"
+          >
+            Save
+          </button>
         </div>
       </div>
 
@@ -61,9 +121,11 @@ const CardEditorScreen: React.FC = () => {
           {activeTab === 'General' && (
             <>
               <div className="flex flex-col gap-2">
-                <label className="text-base font-medium">Card Name</label>
+                <label className="text-base font-medium">Card Name *</label>
                 <input 
                   type="text"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
                   className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-base focus:border-primary focus:ring-primary outline-none transition-all placeholder:text-gray-400 dark:text-white"
                   placeholder="Enter card name"
                 />
@@ -73,9 +135,26 @@ const CardEditorScreen: React.FC = () => {
                 <label className="text-base font-medium">Card Type</label>
                 <input 
                   type="text"
+                  value={cardType}
+                  onChange={(e) => setCardType(e.target.value)}
                   className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-base focus:border-primary focus:ring-primary outline-none transition-all placeholder:text-gray-400 dark:text-white"
-                  placeholder="e.g., Creature, Spell"
+                  placeholder="e.g., Creature, Spell, Artifact"
                 />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-base font-medium">Rarity</label>
+                <select
+                  value={rarity}
+                  onChange={(e) => setRarity(e.target.value)}
+                  className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-base focus:border-primary focus:ring-primary outline-none transition-all dark:text-white"
+                >
+                  <option value="Common">Common</option>
+                  <option value="Uncommon">Uncommon</option>
+                  <option value="Rare">Rare</option>
+                  <option value="Epic">Epic</option>
+                  <option value="Legendary">Legendary</option>
+                </select>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -83,24 +162,33 @@ const CardEditorScreen: React.FC = () => {
                   <label className="text-base font-medium">Cost</label>
                   <input 
                     type="number"
+                    value={cost}
+                    onChange={(e) => setCost(parseInt(e.target.value) || 0)}
                     className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-center text-base focus:border-primary focus:ring-primary outline-none transition-all placeholder:text-gray-400 dark:text-white"
                     placeholder="3"
+                    min="0"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-base font-medium">Power</label>
                   <input 
                     type="number"
+                    value={power || ''}
+                    onChange={(e) => setPower(parseInt(e.target.value) || 0)}
                     className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-center text-base focus:border-primary focus:ring-primary outline-none transition-all placeholder:text-gray-400 dark:text-white"
                     placeholder="5"
+                    min="0"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-base font-medium">Health</label>
                   <input 
                     type="number"
+                    value={health || ''}
+                    onChange={(e) => setHealth(parseInt(e.target.value) || 0)}
                     className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-center text-base focus:border-primary focus:ring-primary outline-none transition-all placeholder:text-gray-400 dark:text-white"
                     placeholder="5"
+                    min="0"
                   />
                 </div>
               </div>
@@ -116,10 +204,13 @@ const CardEditorScreen: React.FC = () => {
              <div className="flex flex-col gap-2">
                <label className="text-base font-medium">Ability Text</label>
                <textarea 
-                 rows={5}
+                 rows={8}
+                 value={abilityText}
+                 onChange={(e) => setAbilityText(e.target.value)}
                  className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-base focus:border-primary focus:ring-primary outline-none transition-all placeholder:text-gray-400 dark:text-white resize-none"
-                 placeholder="Enter abilities, flavor text, or rules..."
+                 placeholder="Enter abilities, effects, and rules text..."
                />
+               <p className="text-xs text-slate-500">Describe what this card does when played or activated</p>
              </div>
           )}
 
