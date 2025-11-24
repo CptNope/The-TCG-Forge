@@ -38,10 +38,8 @@ const BulkEditorScreen: React.FC = () => {
 
   // Load cards into editable format
   useEffect(() => {
-    const filteredCards = cards.filter(c => 
-      c.projectId === currentProjectId && 
-      (!currentSetId || c.setId === currentSetId)
-    );
+    // Show all cards from project (optionally filtered by set)
+    const filteredCards = cards.filter(c => c.projectId === currentProjectId);
     
     setEditableCards(filteredCards.map(card => ({
       id: card.id,
@@ -53,7 +51,7 @@ const BulkEditorScreen: React.FC = () => {
       health: card.health || 0,
       abilityText: card.abilityText,
     })));
-  }, [cards, currentProjectId, currentSetId]);
+  }, [cards, currentProjectId]);
 
   const handleCellEdit = (id: string, field: keyof BulkCardRow, value: any) => {
     setEditableCards(prev => prev.map(card => 
@@ -77,8 +75,13 @@ const BulkEditorScreen: React.FC = () => {
   };
 
   const handleBulkGenerate = () => {
-    if (!currentProjectId || !currentSetId) {
-      alert('Please select a set first');
+    if (!currentProjectId) {
+      alert('Please select a project first');
+      return;
+    }
+
+    if (!currentSetId) {
+      alert('Please select a set first - go to Sets Grid and click a set');
       return;
     }
 
@@ -266,7 +269,18 @@ const BulkEditorScreen: React.FC = () => {
               {/* Bulk Generate */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-3">
-                  <h4 className="font-bold text-sm">Bulk Generate Cards</h4>
+                  <h4 className="font-bold text-sm">
+                    Bulk Generate Cards
+                    {currentSetId ? (
+                      <span className="text-xs font-normal text-green-600 dark:text-green-400 ml-2">
+                        (to current set)
+                      </span>
+                    ) : (
+                      <span className="text-xs font-normal text-orange-600 dark:text-orange-400 ml-2">
+                        (select a set first)
+                      </span>
+                    )}
+                  </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <input
                       type="text"
