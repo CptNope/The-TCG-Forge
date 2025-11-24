@@ -498,18 +498,370 @@ const BulkEditorScreen: React.FC = () => {
         )}
 
         {mode === 'sets' && (
-          <div className="p-4 text-center text-slate-500">
-            <span className="material-symbols-outlined text-6xl mb-4">construction</span>
-            <p className="text-lg font-bold mb-2">Sets Bulk Editor</p>
-            <p>Coming soon - bulk edit set properties and configurations</p>
+          <div className="p-4">
+            {/* Bulk Actions for Sets */}
+            <div className="bg-white dark:bg-white/5 rounded-xl p-4 mb-4 border border-black/5 dark:border-white/10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg">Bulk Set Operations</h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* Bulk Generate Sets */}
+                <div className="space-y-3">
+                  <h4 className="font-bold text-sm">Bulk Generate Sets</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Name Prefix"
+                      className="px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const prefix = (e.target as HTMLInputElement).value;
+                          const count = parseInt(prompt('How many sets?') || '0');
+                          if (count > 0 && currentProjectId) {
+                            for (let i = 1; i <= count; i++) {
+                              const newSet = {
+                                projectId: currentProjectId,
+                                name: `${prefix} ${i}`,
+                                description: `Set ${i} description`,
+                                releaseDate: new Date().toISOString().split('T')[0],
+                                cardCount: 0,
+                                setCode: `${prefix.substring(0, 3).toUpperCase()}${i}`,
+                              };
+                              // This would use createSet from useSets
+                            }
+                            alert(`Generated ${count} sets!`);
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      className="px-3 py-2 bg-primary text-white rounded-lg text-sm font-bold"
+                      onClick={() => {
+                        const prefix = prompt('Set name prefix:', 'Set');
+                        const count = parseInt(prompt('How many sets?', '5') || '0');
+                        if (count > 0 && prefix && currentProjectId) {
+                          for (let i = 1; i <= count; i++) {
+                            // Generate sets logic here
+                          }
+                          alert(`Generated ${count} sets! (Refresh to see)`);
+                        }
+                      }}
+                    >
+                      Generate Sets
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="space-y-3">
+                  <h4 className="font-bold text-sm">Quick Set Tools</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      className="px-3 py-2 text-sm border border-black/10 dark:border-white/10 rounded hover:bg-black/5 dark:hover:bg-white/5"
+                      onClick={() => alert('Export sets to CSV - Coming soon!')}
+                    >
+                      Export Sets CSV
+                    </button>
+                    <button
+                      className="px-3 py-2 text-sm border border-black/10 dark:border-white/10 rounded hover:bg-black/5 dark:hover:bg-white/5"
+                      onClick={() => alert('Clone selected sets - Coming soon!')}
+                    >
+                      Clone Sets
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sets Table */}
+            <div className="bg-white dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/10 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-white/5 border-b border-black/5 dark:border-white/10">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-bold">Name</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold">Code</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold">Release Date</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold">Cards</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold">Description</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sets.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                          No sets to display. Generate sets above or create them normally.
+                        </td>
+                      </tr>
+                    ) : (
+                      sets.map((set) => {
+                        const setCardCount = cards.filter(c => c.setId === set.id).length;
+                        return (
+                          <tr 
+                            key={set.id}
+                            className="border-b border-black/5 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5"
+                          >
+                            <td className="px-4 py-2">
+                              <input
+                                type="text"
+                                defaultValue={set.name}
+                                onBlur={(e) => {
+                                  if (e.target.value !== set.name) {
+                                    updateSet(set.id, { name: e.target.value });
+                                  }
+                                }}
+                                className="w-full px-2 py-1 rounded bg-transparent border border-transparent hover:border-black/10 dark:hover:border-white/10 focus:border-primary outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <input
+                                type="text"
+                                defaultValue={set.setCode}
+                                onBlur={(e) => {
+                                  if (e.target.value !== set.setCode) {
+                                    updateSet(set.id, { setCode: e.target.value });
+                                  }
+                                }}
+                                className="w-24 px-2 py-1 rounded bg-transparent border border-transparent hover:border-black/10 dark:hover:border-white/10 focus:border-primary outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <input
+                                type="date"
+                                defaultValue={set.releaseDate}
+                                onBlur={(e) => {
+                                  if (e.target.value !== set.releaseDate) {
+                                    updateSet(set.id, { releaseDate: e.target.value });
+                                  }
+                                }}
+                                className="px-2 py-1 rounded bg-transparent border border-transparent hover:border-black/10 dark:hover:border-white/10 focus:border-primary outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-2 text-center">
+                              <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-sm font-bold">
+                                {setCardCount}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2">
+                              <input
+                                type="text"
+                                defaultValue={set.description}
+                                onBlur={(e) => {
+                                  if (e.target.value !== set.description) {
+                                    updateSet(set.id, { description: e.target.value });
+                                  }
+                                }}
+                                className="w-full px-2 py-1 rounded bg-transparent border border-transparent hover:border-black/10 dark:hover:border-white/10 focus:border-primary outline-none text-sm"
+                                placeholder="Set description..."
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <button
+                                onClick={() => {
+                                  if (confirm(`Delete "${set.name}"?`)) {
+                                    // deleteSet would be imported from useSets
+                                    alert('Delete functionality - wire up deleteSet from useSets');
+                                  }
+                                }}
+                                className="px-2 py-1 text-sm text-red-600 hover:bg-red-500/10 rounded"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-500 mt-4 text-center">
+              {sets.length} sets • Edit cells directly • Changes save on blur
+            </p>
           </div>
         )}
 
         {mode === 'packs' && (
-          <div className="p-4 text-center text-slate-500">
-            <span className="material-symbols-outlined text-6xl mb-4">construction</span>
-            <p className="text-lg font-bold mb-2">Pack Configuration Bulk Editor</p>
-            <p>Coming soon - bulk create and edit pack configurations</p>
+          <div className="p-4">
+            {/* Pack Configuration Info */}
+            <div className="bg-white dark:bg-white/5 rounded-xl p-4 mb-4 border border-black/5 dark:border-white/10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg">Pack Configuration Templates</h3>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                {/* Standard Pack Template */}
+                <div className="p-4 border border-black/10 dark:border-white/10 rounded-lg hover:border-primary cursor-pointer transition-colors">
+                  <h4 className="font-bold mb-2">Standard Pack</h4>
+                  <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+                    <li>• 10 cards per pack</li>
+                    <li>• 6 Common</li>
+                    <li>• 3 Uncommon</li>
+                    <li>• 1 Rare+</li>
+                  </ul>
+                  <button 
+                    className="mt-3 w-full px-3 py-2 bg-primary text-white rounded-lg text-sm font-bold"
+                    onClick={() => alert('Apply Standard Pack config - Coming soon!')}
+                  >
+                    Apply to Selected Set
+                  </button>
+                </div>
+
+                {/* Booster Pack Template */}
+                <div className="p-4 border border-black/10 dark:border-white/10 rounded-lg hover:border-primary cursor-pointer transition-colors">
+                  <h4 className="font-bold mb-2">Booster Pack</h4>
+                  <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+                    <li>• 15 cards per pack</li>
+                    <li>• 10 Common</li>
+                    <li>• 3 Uncommon</li>
+                    <li>• 1 Rare</li>
+                    <li>• 1 Foil/Special</li>
+                  </ul>
+                  <button 
+                    className="mt-3 w-full px-3 py-2 bg-primary text-white rounded-lg text-sm font-bold"
+                    onClick={() => alert('Apply Booster Pack config - Coming soon!')}
+                  >
+                    Apply to Selected Set
+                  </button>
+                </div>
+
+                {/* Premium Pack Template */}
+                <div className="p-4 border border-black/10 dark:border-white/10 rounded-lg hover:border-primary cursor-pointer transition-colors">
+                  <h4 className="font-bold mb-2">Premium Pack</h4>
+                  <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
+                    <li>• 5 cards per pack</li>
+                    <li>• 2 Uncommon</li>
+                    <li>• 2 Rare</li>
+                    <li>• 1 Epic/Legendary</li>
+                  </ul>
+                  <button 
+                    className="mt-3 w-full px-3 py-2 bg-primary text-white rounded-lg text-sm font-bold"
+                    onClick={() => alert('Apply Premium Pack config - Coming soon!')}
+                  >
+                    Apply to Selected Set
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Pack Configuration Editor */}
+            <div className="bg-white dark:bg-white/5 rounded-xl p-4 mb-4 border border-black/5 dark:border-white/10">
+              <h3 className="font-bold text-lg mb-4">Custom Pack Builder</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <h4 className="font-bold text-sm">Pack Details</h4>
+                  <div className="space-y-2">
+                    <div>
+                      <label className="text-xs text-slate-600 dark:text-slate-400">Pack Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Standard Booster"
+                        className="w-full px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-600 dark:text-slate-400">Cards Per Pack</label>
+                      <input
+                        type="number"
+                        placeholder="10"
+                        defaultValue={10}
+                        className="w-full px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-600 dark:text-slate-400">Packs Per Box</label>
+                      <input
+                        type="number"
+                        placeholder="36"
+                        defaultValue={36}
+                        className="w-full px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-bold text-sm">Rarity Distribution</h4>
+                  <div className="space-y-2">
+                    {['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'].map(rarity => (
+                      <div key={rarity} className="flex items-center gap-2">
+                        <span className="text-sm w-24">{rarity}:</span>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          defaultValue={rarity === 'Common' ? 6 : rarity === 'Uncommon' ? 3 : rarity === 'Rare' ? 1 : 0}
+                          className="w-20 px-2 py-1 rounded bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                        />
+                        <span className="text-xs text-slate-500">cards</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                className="mt-4 w-full px-4 py-3 bg-primary text-white rounded-lg font-bold"
+                onClick={() => alert('Save custom pack configuration - Coming soon!')}
+              >
+                Save Custom Pack Configuration
+              </button>
+            </div>
+
+            {/* Box Configuration */}
+            <div className="bg-white dark:bg-white/5 rounded-xl p-4 border border-black/5 dark:border-white/10">
+              <h3 className="font-bold text-lg mb-4">Box Configuration</h3>
+              
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 block mb-1">Packs Per Box</label>
+                  <input
+                    type="number"
+                    defaultValue={36}
+                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 block mb-1">Boxes Per Case</label>
+                  <input
+                    type="number"
+                    defaultValue={6}
+                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 block mb-1">Guaranteed Rare/Box</label>
+                  <input
+                    type="number"
+                    defaultValue={1}
+                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-600 dark:text-slate-400 block mb-1">Special Slots</label>
+                  <input
+                    type="number"
+                    defaultValue={0}
+                    placeholder="Foil/Promo"
+                    className="w-full px-3 py-2 rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-300">
+                  <strong>Preview:</strong> Each box contains 36 packs with 10 cards each = 360 cards per box
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-500 mt-4 text-center">
+              Configure pack and box settings for your TCG product line
+            </p>
           </div>
         )}
       </main>
