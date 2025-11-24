@@ -71,10 +71,14 @@ const CardSetsListScreen: React.FC = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {setCards.map((card) => (
-              <div key={card.id} className="group">
+              <div 
+                key={card.id} 
+                className="group cursor-pointer"
+                onClick={() => navigate(`/card-editor?id=${card.id}`)}
+              >
                 <CardPreview
                   card={card}
-                  className="w-full cursor-pointer hover:scale-105 transition-transform"
+                  className="w-full hover:scale-105 transition-transform"
                   showStats={true}
                 />
                 <div className="mt-2 text-center">

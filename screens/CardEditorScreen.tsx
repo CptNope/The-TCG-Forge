@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCards } from '../src/hooks/useCards';
 import { useAppContext } from '../src/context/AppContext';
 import { CardPreview } from '../src/components/CardPreview';
@@ -7,8 +7,11 @@ import { AVATAR_STYLES } from '../src/utils/placeholderImages';
 
 const CardEditorScreen: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editingCardId = searchParams.get('id');
+  
   const { currentProjectId, currentSetId } = useAppContext();
-  const { createCard } = useCards(currentProjectId || undefined);
+  const { cards, createCard, updateCard } = useCards(currentProjectId || undefined);
   
   const [activeTab, setActiveTab] = useState('General');
   const [cardName, setCardName] = useState('');
@@ -20,30 +23,60 @@ const CardEditorScreen: React.FC = () => {
   const [rarity, setRarity] = useState('Common');
   const [avatarStyle, setAvatarStyle] = useState<'identicon' | 'bottts' | 'avataaars' | 'shapes' | 'pixel-art' | 'monsters' | 'initials' | 'gradients'>('identicon');
 
+  // Load existing card data if editing
+  useEffect(() => {
+    if (editingCardId) {
+      const card = cards.find(c => c.id === editingCardId);
+      if (card) {
+        setCardName(card.name);
+        setCardType(card.type);
+        setCost(card.cost);
+        setPower(card.power || 0);
+        setHealth(card.health || 0);
+        setAbilityText(card.abilityText);
+        setRarity(card.rarity);
+      }
+    }
+  }, [editingCardId, cards]);
+
   const handleSave = () => {
     if (!cardName.trim() || !currentProjectId || !currentSetId) {
       alert('Please fill in at least the card name');
       return;
     }
 
-    createCard({
-      projectId: currentProjectId,
-      setId: currentSetId,
-      name: cardName,
-      type: cardType || 'Creature',
-      cost: cost || 0,
-      power: power,
-      health: health,
-      abilityText: abilityText,
-      flavorText: '',
-      artwork: '',
-      rarity: rarity,
-      attributes: {},
-      tags: [],
-    });
+    if (editingCardId) {
+      // Update existing card
+      updateCard(editingCardId, {
+        name: cardName,
+        type: cardType,
+        cost: cost,
+        power: power,
+        health: health,
+        abilityText: abilityText,
+        rarity: rarity,
+      });
+      alert(`Card "${cardName}" updated successfully!`);
+    } else {
+      // Create new card
+      createCard({
+        projectId: currentProjectId,
+        setId: currentSetId,
+        name: cardName,
+        type: cardType,
+        cost: cost,
+        power: power,
+        health: health,
+        abilityText: abilityText,
+        flavorText: '',
+        artwork: '',
+        rarity: rarity,
+        attributes: {},
+        tags: [],
+      });
+      alert(`Card "${cardName}" created successfully!`);
+    }
 
-    // Show success and navigate to cards list
-    alert(`Card "${cardName}" created successfully!`);
     navigate('/sets-list');
   };
 
@@ -73,7 +106,7 @@ const CardEditorScreen: React.FC = () => {
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </button>
         </div>
-        <h2 className="text-lg font-bold leading-tight flex-1 text-center">Create New Card</h2>
+        <h2 className="text-lg font-bold leading-tight flex-1 text-center">{editingCardId ? 'Edit Card' : 'Create New Card'}</h2>
         <div className="flex w-12 items-center justify-end">
           <button 
             onClick={handleSave}
