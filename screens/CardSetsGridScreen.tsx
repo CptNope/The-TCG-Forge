@@ -170,7 +170,8 @@ const CardSetsGridScreen: React.FC = () => {
       </main>
 
       {/* FABs */}
-      <div className="fixed bottom-24 right-4 z-20 flex flex-col items-center gap-4">
+      <div className="fixed bottom-24 right-4 z-20 flex flex-col items-end gap-3">
+        {/* Add Card Button (Secondary) */}
         <button 
           onClick={() => {
             if (sets.length === 0) {
@@ -180,16 +181,21 @@ const CardSetsGridScreen: React.FC = () => {
             setCurrentSetId(sets[0].id);
             navigate('/card-editor');
           }}
-          className="flex h-12 w-auto items-center justify-center gap-2 overflow-hidden rounded-full bg-white dark:bg-zinc-700 px-4 py-3 text-zinc-900 dark:text-white shadow-lg shadow-black/20 hover:scale-105 active:scale-95 transition-all"
+          className="flex h-12 w-auto items-center justify-center gap-2 rounded-full bg-white dark:bg-zinc-700 px-4 py-3 text-zinc-900 dark:text-white shadow-lg shadow-black/20 hover:scale-105 active:scale-95 transition-all"
+          title="Add a new card to a set"
         >
-          <span className="material-symbols-outlined text-2xl">note_add</span>
-          <span className="text-sm font-bold">Add New Card</span>
+          <span className="material-symbols-outlined text-xl">style</span>
+          <span className="text-sm font-bold">New Card</span>
         </button>
+        
+        {/* Add Set Button (Primary) */}
         <button 
            onClick={() => setShowNewSetDialog(true)}
-           className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
+           className="flex h-14 w-auto items-center justify-center gap-2 rounded-full bg-primary text-white shadow-lg shadow-primary/40 hover:scale-105 active:scale-95 transition-all px-5"
+           title="Create a new card set"
         >
-          <span className="material-symbols-outlined text-3xl">add</span>
+          <span className="material-symbols-outlined text-2xl">add</span>
+          <span className="text-base font-bold">New Set</span>
         </button>
       </div>
 
