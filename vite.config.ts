@@ -28,13 +28,13 @@ export default defineConfig(({ mode }) => {
             display: 'standalone',
             icons: [
               {
-                src: '/icons/icon-192x192.svg',
+                src: '/The-TCG-Forge/icons/icon-192x192.svg',
                 sizes: '192x192',
                 type: 'image/svg+xml',
                 purpose: 'any maskable'
               },
               {
-                src: '/icons/icon-512x512.svg',
+                src: '/The-TCG-Forge/icons/icon-512x512.svg',
                 sizes: '512x512',
                 type: 'image/svg+xml',
                 purpose: 'any maskable'
