@@ -11,6 +11,7 @@ import AttributesScreen from './screens/AttributesScreen';
 import PackSimulatorScreen from './screens/PackSimulatorScreen';
 import BulkEditorScreen from './screens/BulkEditorScreen';
 import AttributeSchemaScreen from './screens/AttributeSchemaScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
 // Scroll to top wrapper
 const ScrollToTop: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -37,6 +38,7 @@ const App: React.FC = () => {
             <Route path="/attributes" element={<AttributesScreen />} />
             <Route path="/attribute-schema" element={<AttributeSchemaScreen />} />
             <Route path="/bulk-editor" element={<BulkEditorScreen />} />
+            <Route path="/settings" element={<SettingsScreen />} />
           </Routes>
         </ScrollToTop>
       </HashRouter>
