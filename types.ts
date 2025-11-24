@@ -47,11 +47,18 @@ export interface Attribute {
   id: string;
   projectId: string;
   name: string;
-  type: 'Number' | 'Icon' | 'Tag' | 'Text';
+  type: 'Number' | 'Text' | 'Boolean' | 'Dropdown' | 'List' | 'Color' | 'Date' | 'Icon' | 'Tag';
   weight: number;
   icon: string;
   color: string;
   defaultValue?: any;
+  options?: string[]; // For dropdown/list types
+  min?: number; // For number types
+  max?: number; // For number types
+  required?: boolean; // Is this attribute required?
+  isCore?: boolean; // Is this a core attribute (like name)?
+  displayInPreview?: boolean; // Show in card preview?
+  category?: string; // Group attributes (e.g., "Stats", "Info", "Mechanics")
   dateCreated: string;
   dateModified: string;
 }
