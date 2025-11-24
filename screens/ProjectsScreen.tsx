@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../src/hooks/useProjects';
+import { useAppContext } from '../src/context/AppContext';
 
 const ProjectsScreen: React.FC = () => {
   const navigate = useNavigate();
   const { projects, loading, createProject, deleteProject } = useProjects();
+  const { setCurrentProjectId } = useAppContext();
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectDetails, setNewProjectDetails] = useState('');
@@ -83,7 +85,10 @@ const ProjectsScreen: React.FC = () => {
               projects.map((project) => (
                 <div 
                   key={project.id}
-                  onClick={() => navigate('/sets-grid')}
+                  onClick={() => {
+                    setCurrentProjectId(project.id);
+                    navigate('/sets-grid');
+                  }}
                   className="flex flex-col gap-4 rounded-xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 p-4 active:scale-[0.99] transition-transform cursor-pointer shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-4">

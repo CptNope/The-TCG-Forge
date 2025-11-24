@@ -12,7 +12,17 @@ export function useProjects() {
   // Load projects on mount
   useEffect(() => {
     const loadedProjects = Storage.load<Project[]>(STORAGE_KEYS.PROJECTS, []);
-    setProjects(loadedProjects);
+    
+    // If no projects exist, load sample data
+    if (loadedProjects.length === 0) {
+      const { generateSampleProjects } = require('../storage/sampleData');
+      const sampleProjects = generateSampleProjects();
+      setProjects(sampleProjects);
+      Storage.save(STORAGE_KEYS.PROJECTS, sampleProjects);
+    } else {
+      setProjects(loadedProjects);
+    }
+    
     setLoading(false);
   }, []);
 
