@@ -8,6 +8,7 @@ import CardSetsListScreen from './screens/CardSetsListScreen';
 import CardEditorScreen from './screens/CardEditorScreen';
 import PackDesignerScreen from './screens/PackDesignerScreen';
 import AttributesScreen from './screens/AttributesScreen';
+import PackSimulatorScreen from './screens/PackSimulatorScreen';
 
 // Scroll to top wrapper
 const ScrollToTop: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -30,6 +31,7 @@ const App: React.FC = () => {
             <Route path="/sets-list" element={<CardSetsListScreen />} />
             <Route path="/card-editor" element={<CardEditorScreen />} />
             <Route path="/pack-designer" element={<PackDesignerScreen />} />
+            <Route path="/pack-simulator" element={<PackSimulatorScreen />} />
             <Route path="/attributes" element={<AttributesScreen />} />
           </Routes>
         </ScrollToTop>

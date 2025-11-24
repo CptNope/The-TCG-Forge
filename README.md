@@ -353,6 +353,7 @@ This project is open source and available under the MIT License.
 
 - **Live App**: https://cptnope.github.io/The-TCG-Forge/
 - **Documentation**: [DEPLOYMENT.md](./DEPLOYMENT.md)
+- **Vendor Guide**: [VENDOR_GUIDE.md](./VENDOR_GUIDE.md) - Trusted print shops with pros/cons
 - **Issues**: [GitHub Issues](../../issues)
 - **Deployment Guide**: [DEPLOYMENT.md](./DEPLOYMENT.md)
 

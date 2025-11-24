@@ -3,15 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { useSets } from '../src/hooks/useSets';
 import { useCards } from '../src/hooks/useCards';
 import { useAppContext } from '../src/context/AppContext';
+import { useProjects } from '../src/hooks/useProjects';
+import { exportAllFormats } from '../src/utils/exportFormats';
 
 const CardSetsGridScreen: React.FC = () => {
   const navigate = useNavigate();
   const { currentProjectId, setCurrentSetId } = useAppContext();
   const { sets, loading, createSet, deleteSet } = useSets(currentProjectId || undefined);
   const { cards } = useCards(currentProjectId || undefined);
+  const { getProject } = useProjects();
   const [showNewSetDialog, setShowNewSetDialog] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const [newSetName, setNewSetName] = useState('');
   const [newSetTarget, setNewSetTarget] = useState('100');
+
+  const handleExportAll = () => {
+    const project = getProject(currentProjectId!);
+    if (!project) return;
+    exportAllFormats(project, sets, cards);
+    setShowExportMenu(false);
+    alert('Export files downloaded! Check your Downloads folder.');
+  };
 
   const handleCreateSet = () => {
     if (!newSetName.trim() || !currentProjectId) return;
@@ -58,9 +70,27 @@ const CardSetsGridScreen: React.FC = () => {
           <span className="material-symbols-outlined text-zinc-800 dark:text-white text-2xl">widgets</span>
         </div>
         <h1 className="text-zinc-900 dark:text-white text-lg font-bold leading-tight flex-1 text-center">My Card Sets</h1>
-        <div className="flex w-12 items-center justify-end">
-          <button className="flex items-center justify-center h-12 w-12 text-zinc-800 dark:text-white">
-            <span className="material-symbols-outlined text-2xl">search</span>
+        <div className="flex items-center justify-end gap-2">
+          <button 
+            onClick={() => {
+              if (cards.length === 0) {
+                alert('Create some cards first!');
+                return;
+              }
+              if (sets.length > 0) {
+                setCurrentSetId(sets[0].id);
+                navigate('/pack-simulator');
+              }
+            }}
+            className="flex items-center justify-center h-10 px-3 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+          >
+            <span className="material-symbols-outlined text-xl">shuffle</span>
+          </button>
+          <button 
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="flex items-center justify-center h-10 px-3 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+          >
+            <span className="material-symbols-outlined text-xl">download</span>
           </button>
         </div>
       </header>
@@ -162,6 +192,55 @@ const CardSetsGridScreen: React.FC = () => {
           <span className="material-symbols-outlined text-3xl">add</span>
         </button>
       </div>
+
+      {/* Export Menu */}
+      {showExportMenu && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowExportMenu(false)}>
+          <div className="bg-white dark:bg-panel-dark rounded-xl p-6 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-xl font-bold mb-4">Export for Production</h2>
+            
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+              Export your cards in professional formats for manufacturers and print services.
+            </p>
+
+            <div className="space-y-3 mb-6">
+              <div className="p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
+                <p className="text-sm font-medium">📄 CSV for Print Shops</p>
+                <p className="text-xs text-slate-500 mt-1">Standard format for most manufacturers</p>
+              </div>
+              <div className="p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
+                <p className="text-sm font-medium">📋 JSON Full Data</p>
+                <p className="text-xs text-slate-500 mt-1">Complete backup with all information</p>
+              </div>
+              <div className="p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
+                <p className="text-sm font-medium">📝 Manufacturing Specs</p>
+                <p className="text-xs text-slate-500 mt-1">Detailed specifications document</p>
+              </div>
+              <div className="p-3 bg-slate-50 dark:bg-white/5 rounded-lg">
+                <p className="text-sm font-medium">🎴 MakePlayingCards Format</p>
+                <p className="text-xs text-slate-500 mt-1">Ready for print-on-demand service</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowExportMenu(false)}
+                className="flex-1 px-4 py-3 rounded-lg border border-black/10 dark:border-white/10 font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleExportAll}
+                disabled={cards.length === 0}
+                className="flex-1 px-4 py-3 rounded-lg bg-green-600 text-white font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-xl">download</span>
+                Export All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* New Set Dialog */}
       {showNewSetDialog && (
