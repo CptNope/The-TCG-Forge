@@ -2,19 +2,57 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# The TCG Forge
 
-This contains everything you need to run your app locally.
+A modern Progressive Web App for creating and managing trading card games.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1Xwcg0_mdtm12_SXGtMHrAwS5Lj-a8ayD
+## Features
 
-## Run Locally
+- Create custom trading card games
+- Design and manage cards
+- Modern, responsive UI
+- Dark mode support
+- **PWA support** - Install on any device
+- **Offline support** - Works without internet
+- **Auto-deployment** - Deploy to GitHub Pages on every push
 
-**Prerequisites:**  Node.js
+## Getting Started
 
+```bash
+# Install dependencies
+npm install
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Generate PWA icons
+npm run generate-icons
+```
+
+## Deployment
+
+This project automatically deploys to GitHub Pages as a PWA. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed setup instructions.
+
+### Quick Setup
+
+1. Enable GitHub Pages in repository settings (select "GitHub Actions" as source)
+2. Push to `main` branch - automatic deployment starts
+3. Optional: Add `GEMINI_API_KEY` secret in repository settings if using Gemini API
+
+Your app will be available at: `https://<username>.github.io/<repo-name>/`
+
+## Tech Stack
+
+- React 19
+- TypeScript
+- Vite
+- TailwindCSS
+- React Router
+- Vite PWA Plugin
+- GitHub Actions
