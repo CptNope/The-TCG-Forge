@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CardSet } from '../../types';
 import { Storage, STORAGE_KEYS } from '../storage/localStorage';
+import { generateSampleSets } from '../storage/sampleData';
 
 /**
  * Custom hook for managing card sets with localStorage persistence
@@ -15,7 +16,6 @@ export function useSets(projectId?: string) {
     
     // If no sets exist for this project, load sample data
     if (projectId && loadedSets.filter(s => s.projectId === projectId).length === 0) {
-      const { generateSampleSets } = require('../storage/sampleData');
       const sampleSets = generateSampleSets(projectId);
       const allSets = [...loadedSets, ...sampleSets];
       setSets(allSets);

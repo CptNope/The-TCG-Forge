@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Project } from '../../types';
 import { Storage, STORAGE_KEYS } from '../storage/localStorage';
+import { generateSampleProjects } from '../storage/sampleData';
 
 /**
  * Custom hook for managing projects with localStorage persistence
@@ -15,7 +16,6 @@ export function useProjects() {
     
     // If no projects exist, load sample data
     if (loadedProjects.length === 0) {
-      const { generateSampleProjects } = require('../storage/sampleData');
       const sampleProjects = generateSampleProjects();
       setProjects(sampleProjects);
       Storage.save(STORAGE_KEYS.PROJECTS, sampleProjects);
