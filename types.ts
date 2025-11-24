@@ -53,6 +53,7 @@ export interface Attribute {
   color: string;
   defaultValue?: any;
   dateCreated: string;
+  dateModified: string;
 }
 
 export interface RaritySlot {
