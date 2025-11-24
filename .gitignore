@@ -17,10 +17,6 @@ dist-ssr
 .env.local
 .env.*.local
 
-# Auto-generated PWA assets
-public/icons/
-public/favicon.svg
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
