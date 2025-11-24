@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCards } from '../src/hooks/useCards';
 import { useAppContext } from '../src/context/AppContext';
+import { CardPreview } from '../src/components/CardPreview';
+import { AVATAR_STYLES } from '../src/utils/placeholderImages';
 
 const CardEditorScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const CardEditorScreen: React.FC = () => {
   const [health, setHealth] = useState(0);
   const [abilityText, setAbilityText] = useState('');
   const [rarity, setRarity] = useState('Common');
+  const [avatarStyle, setAvatarStyle] = useState<'identicon' | 'bottts' | 'avataaars' | 'shapes' | 'pixel-art' | 'monsters' | 'initials' | 'gradients'>('identicon');
 
   const handleSave = () => {
     if (!cardName.trim() || !currentProjectId || !currentSetId) {
@@ -84,17 +87,24 @@ const CardEditorScreen: React.FC = () => {
       <div className="flex-1 overflow-y-auto">
         {/* Preview Area */}
         <div className="p-4 bg-gray-100 dark:bg-[#20182b]">
-          <div 
-            className="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-center items-center overflow-hidden rounded-xl min-h-[360px] shadow-lg border border-black/5 dark:border-white/5 bg-gray-200 dark:bg-gray-800"
-            style={{
-               backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCuzh7R72dU033AOAqeuUcUQLFqq-ESA8c4t71Se_7COuzc4iTMlFPSppuibVMbCFNX5Xs6F-k9dsGt7gdqED2XQc70ySH76MkgCWX-DTD6wqGFZyyq4nR5vv20FkHsivEH1HPg276OA-QIeZYI6JhXvbo1ftFInjYLTlo5eC03xGUnQOY7yfcKK0GgxCkHE2VxsJp-hXe53gIyfjA36YiC3bPjV86uCmDFt5g6QaUIVcwkclXUu1_3rcKh8ACknbXNvE6YgzWHgy8")' 
+          <CardPreview
+            card={{
+              name: cardName || 'Card Name',
+              type: cardType || 'Type',
+              rarity: rarity,
+              cost: cost,
+              power: power,
+              health: health,
+              abilityText: abilityText,
+              artwork: '',
             }}
-          >
-            <div className="text-center text-gray-500 dark:text-white/30 p-4 rounded-lg flex flex-col items-center">
-              <span className="material-symbols-outlined text-5xl mb-2">add_photo_alternate</span>
-              <p className="text-sm font-medium">Tap to upload artwork</p>
-            </div>
-          </div>
+            avatarStyle={avatarStyle}
+            className="w-full"
+            showStats={true}
+          />
+          <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-2">
+            Live preview with auto-generated placeholder
+          </p>
         </div>
 
         {/* Tabs */}
@@ -193,9 +203,26 @@ const CardEditorScreen: React.FC = () => {
                 </div>
               </div>
 
+              <div className="flex flex-col gap-2">
+                <label className="text-base font-medium">Placeholder Style</label>
+                <select
+                  value={avatarStyle}
+                  onChange={(e) => setAvatarStyle(e.target.value as any)}
+                  className="w-full rounded-lg bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 p-4 text-base focus:border-primary focus:ring-primary outline-none transition-all dark:text-white"
+                  title="Choose placeholder avatar style"
+                >
+                  {AVATAR_STYLES.map(style => (
+                    <option key={style.value} value={style.value}>
+                      {style.label} - {style.description}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-slate-500">Auto-generated image style when no artwork is uploaded</p>
+              </div>
+
               <button className="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors mt-4">
                 <span className="material-symbols-outlined">upload_file</span>
-                <span className="text-base font-bold">Upload Alternate Art</span>
+                <span className="text-base font-bold">Upload Custom Artwork (Coming Soon)</span>
               </button>
             </>
           )}
