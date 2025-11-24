@@ -42,9 +42,9 @@ const CardEditorScreen: React.FC = () => {
       tags: [],
     });
 
-    // Show success and go back
+    // Show success and navigate to cards list
     alert(`Card "${cardName}" created successfully!`);
-    navigate(-1);
+    navigate('/sets-list');
   };
 
   if (!currentProjectId || !currentSetId) {

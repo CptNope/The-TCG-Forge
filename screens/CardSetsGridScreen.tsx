@@ -9,9 +9,12 @@ import { exportAllFormats } from '../src/utils/exportFormats';
 const CardSetsGridScreen: React.FC = () => {
   const navigate = useNavigate();
   const { currentProjectId, setCurrentSetId } = useAppContext();
-  const { sets, loading, createSet, deleteSet } = useSets(currentProjectId || undefined);
+  const { sets: allSets, loading, createSet, deleteSet } = useSets(currentProjectId || undefined);
   const { cards } = useCards(currentProjectId || undefined);
   const { getProject } = useProjects();
+  
+  // Filter sets to only show sets for current project
+  const sets = allSets.filter(s => s.projectId === currentProjectId);
   const [showNewSetDialog, setShowNewSetDialog] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [newSetName, setNewSetName] = useState('');
