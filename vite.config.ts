@@ -5,10 +5,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
-    // Use repo name for GitHub Pages base path, or '/' for custom domain
-    const base = process.env.GITHUB_REPOSITORY 
-      ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/`
-      : '/';
+    // Set base path for GitHub Pages deployment
+    const base = '/The-TCG-Forge/';
     
     return {
       base,
