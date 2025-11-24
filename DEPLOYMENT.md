@@ -9,6 +9,8 @@ This project is configured to automatically deploy to GitHub Pages as a Progress
    npm install
    ```
    This will automatically generate PWA icons via the `postinstall` script.
+   
+   **Note:** If you see TypeScript/module errors before running npm install, this is normal. They will resolve after installation.
 
 2. **Enable GitHub Pages:**
    - Go to your repository on GitHub
