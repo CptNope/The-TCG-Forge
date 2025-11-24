@@ -12,9 +12,20 @@ export function useSets(projectId?: string) {
   // Load sets on mount
   useEffect(() => {
     const loadedSets = Storage.load<CardSet[]>(STORAGE_KEYS.SETS, []);
-    setSets(loadedSets);
+    
+    // If no sets exist for this project, load sample data
+    if (projectId && loadedSets.filter(s => s.projectId === projectId).length === 0) {
+      const { generateSampleSets } = require('../storage/sampleData');
+      const sampleSets = generateSampleSets(projectId);
+      const allSets = [...loadedSets, ...sampleSets];
+      setSets(allSets);
+      Storage.save(STORAGE_KEYS.SETS, allSets);
+    } else {
+      setSets(loadedSets);
+    }
+    
     setLoading(false);
-  }, []);
+  }, [projectId]);
 
   // Save sets whenever they change
   useEffect(() => {

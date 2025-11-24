@@ -1,18 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CardSet } from '../types';
-
-const cardSets: CardSet[] = [
-  { id: '1', name: 'Chronicles of Aethel', count: '78/100 Cards', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCMAeVo0THX0WngFxV6NEpfoCAokuzfNjQ6t2l2juVusNW7iTFIcZHyYWokXgCdO51PAgD1GOPK04rt1iLnRelYyf2LztR6yZS1HjFPIDkJvKT14al-f8szxDtEl-We3h9Fq3Hw0rYHnloHnfkJtb7coxrmnYNxKu96ASYVpy2xUTd22MbsJorOd17HYb8B-a4vblezkckZmBinIJK312LPymtVLbTbo_napaOhSZSLj7QPl46-BQZ8QWSGDHoPiHdAfNSjlbka--8' },
-  { id: '2', name: 'Voidwalkers', count: '150/150 Cards', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCaN-0iH685JayAGVX7Vt_FmddMQEYCymILTnhV8JYrYeiTzLAve04yhUz3vBUu-JMncwS8jktHyJ-K5qCSi7D-jt6YfJiCdlWrt8v33YU5fAKZ9xlVe13Hb5JUdXG_SMnYFyOAG9k6uCN2uQE2envMC75Zer97QtIR14esE-btJhtmsBx3OlsalmrKflGUhHKTa9Mlojteo-RUeEbnL6rt8t3uVd_GA_9AyLvzn2bQMpNpGwTODRwElyg73o8u8AaNP7Pxg3lIXkc' },
-  { id: '3', name: 'Sunken Treasures', count: '45/120 Cards', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBdoJwmMSQpPM394krZt6GJwNEH0ryyI5g2cLiEfeJiiH-JvHrpCH24Xj50HUwe8Ddbu3CieekGlyySTndfoi5VibF3o9rKDPHC60-GEkOIgoeAdT4oP-EsNf4wlkKJKlTUXvTU0BYxZSZ68FgOpd1-5AD1fd_xPXiuxwPwC6mkye6v78OZ0y9baG-rge4-5grZD6_AFhlMomnzMyE6HZFn20VtY9uv-9VEsrCPOj1-x9a3B0rKVOU1cmVydI6EX8QFORb6tqb8R_4' },
-  { id: '4', name: 'Skywardens', count: '99/100 Cards', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDn_GmftOO1RWQcNeIa0vJ7E2ORIHZ2Ja7zvcqVDToR2gC9eTRYTAA0QgybLHTh_QqV-bDdD6qgVVh--k33ztcWG08ZVVOpnamyKZzZgdSy8TT0yCDcG1t1IIBl_CK-Dggc8NrhOQMJQ2yFkYuSxipO79ww_bITWJVDX-hmNkC-9soRja7FRseumKGU61G_lrYQHFtEJtGpdvddvO0mZGfKAusfrkLfkPRKRAELK21MezRmVxMEdFeG0jYRjJjD9jvYQiH6ebD3LUA' },
-  { id: '5', name: 'Iron Empire', count: '200/200 Cards', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA4CMKOpcTQ09Rj5v2mnsPQ_qBZYX9RC6hYmkv9Bk9u7wgaf5qhtLE6S3tKvuWurFX7I0Okem0MuAiIcjl1dA75Yd2kntB0DTKoXJdsKT1rV7m3SHGrkMigDohACbfFo8zYwZI4FlTGUlm2L_3mNAQSugP0SswPx5veJ1u0FNkKxaDfU0aQXz-sRJUeuHoB3MRzQzFd88o2GeVfp8RfZKl93iUpfn3dEeHeXarMZoirS4_qGopstuH92TkotCK-34lsaE0mGNYKFsU' },
-  { id: '6', name: 'Mystic Grove', count: '60/150 Cards', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBtBAV5niZo5wUQbpkHfvl3ZImMaz-qgHsBTdsT4R-LD8qyxTLYh0yyouZyh-y7wPv-J-cF0AhbSJo7c5OhMdaJJ1fiJRK8lLPFzeXfbgukVKc6F0_3FwKXrCJAG8ZRLplrUjYyo98ulxzC9d6e0N487yccqtLfXxlq1Arr084c3CdqoRb_WaGr1iPrCW4tIn7eWP81VmELnOkTwS_6D7aWLLDSQ-up40sQORSiZw03sBpj-JVO4-StXBUospD7YqVZWGTmZEt26r4' },
-];
+import { useSets } from '../src/hooks/useSets';
+import { useCards } from '../src/hooks/useCards';
+import { useAppContext } from '../src/context/AppContext';
 
 const CardSetsGridScreen: React.FC = () => {
   const navigate = useNavigate();
+  const { currentProjectId, setCurrentSetId } = useAppContext();
+  const { sets, loading, createSet, deleteSet } = useSets(currentProjectId || undefined);
+  const { cards } = useCards(currentProjectId || undefined);
+  const [showNewSetDialog, setShowNewSetDialog] = useState(false);
+  const [newSetName, setNewSetName] = useState('');
+  const [newSetTarget, setNewSetTarget] = useState('100');
+
+  const handleCreateSet = () => {
+    if (!newSetName.trim() || !currentProjectId) return;
+    
+    createSet({
+      projectId: currentProjectId,
+      name: newSetName,
+      count: `0/${newSetTarget}`,
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCMAeVo0THX0WngFxV6NEpfoCAokuzfNjQ6t2l2juVusNW7iTFIcZHyYWokXgCdO51PAgD1GOPK04rt1iLnRelYyf2LztR6yZS1HjFPIDkJvKT14al-f8szxDtEl-We3h9Fq3Hw0rYHnloHnfkJtb7coxrmnYNxKu96ASYVpy2xUTd22MbsJorOd17HYb8B-a4vblezkckZmBinIJK312LPymtVLbTbo_napaOhSZSLj7QPl46-BQZ8QWSGDHoPiHdAfNSjlbka--8',
+      description: 'New card set',
+    });
+    
+    setNewSetName('');
+    setNewSetTarget('100');
+    setShowNewSetDialog(false);
+  };
+
+  const getCardCount = (setId: string) => {
+    const setCards = cards.filter(c => c.setId === setId);
+    return setCards.length;
+  };
+
+  if (!currentProjectId) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-500 mb-4">No project selected</p>
+          <button
+            onClick={() => navigate('/projects')}
+            className="px-4 py-2 bg-primary text-white rounded-lg"
+          >
+            Go to Projects
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white overflow-hidden">
@@ -46,38 +82,144 @@ const CardSetsGridScreen: React.FC = () => {
 
       {/* Grid Content */}
       <main className="flex-grow overflow-y-auto pb-32">
-        <div className="grid grid-cols-2 gap-4 p-4">
-          {cardSets.map((set) => (
-            <div key={set.id} className="flex flex-col gap-3 group cursor-pointer" onClick={() => navigate('/sets-list')}>
-              <div 
-                className="w-full aspect-[3/4] bg-center bg-no-repeat bg-cover rounded-xl shadow-md group-hover:shadow-lg transition-all group-active:scale-[0.98]"
-                style={{ backgroundImage: `url("${set.image}")` }}
-              ></div>
-              <div>
-                <p className="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">{set.name}</p>
-                <p className="text-zinc-500 dark:text-zinc-400 text-sm font-normal leading-normal">{set.count}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <p className="text-slate-500">Loading sets...</p>
+          </div>
+        ) : sets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center px-4">
+            <span className="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700 mb-4">inventory_2</span>
+            <p className="text-lg font-medium mb-2">No card sets yet</p>
+            <p className="text-sm text-slate-500 mb-4">Create your first set to start adding cards</p>
+            <button
+              onClick={() => setShowNewSetDialog(true)}
+              className="px-6 py-3 bg-primary text-white rounded-lg font-bold"
+            >
+              Create First Set
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 p-4">
+            {sets.map((set) => {
+              const cardCount = getCardCount(set.id);
+              const [current, target] = set.count.split('/').map(s => s.replace(' Cards', '').trim());
+              const displayCount = `${cardCount}/${target || current} Cards`;
+              
+              return (
+                <div key={set.id} className="flex flex-col gap-3 group">
+                  <div 
+                    className="w-full aspect-[3/4] bg-center bg-no-repeat bg-cover rounded-xl shadow-md group-hover:shadow-lg transition-all group-active:scale-[0.98] cursor-pointer bg-slate-200 dark:bg-slate-700"
+                    style={{ backgroundImage: `url("${set.image}")` }}
+                    onClick={() => {
+                      setCurrentSetId(set.id);
+                      navigate('/sets-list');
+                    }}
+                  ></div>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1">
+                      <p className="text-zinc-900 dark:text-white text-base font-medium leading-normal line-clamp-1">{set.name}</p>
+                      <p className="text-zinc-500 dark:text-zinc-400 text-sm font-normal leading-normal">{displayCount}</p>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Delete "${set.name}"?`)) {
+                          deleteSet(set.id);
+                        }
+                      }}
+                      className="p-2 hover:bg-red-500/10 rounded-full text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-xl">delete</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </main>
 
       {/* FABs */}
       <div className="fixed bottom-24 right-4 z-20 flex flex-col items-center gap-4">
         <button 
-          onClick={() => navigate('/card-editor')}
+          onClick={() => {
+            if (sets.length === 0) {
+              alert('Please create a set first');
+              return;
+            }
+            setCurrentSetId(sets[0].id);
+            navigate('/card-editor');
+          }}
           className="flex h-12 w-auto items-center justify-center gap-2 overflow-hidden rounded-full bg-white dark:bg-zinc-700 px-4 py-3 text-zinc-900 dark:text-white shadow-lg shadow-black/20 hover:scale-105 active:scale-95 transition-all"
         >
           <span className="material-symbols-outlined text-2xl">note_add</span>
           <span className="text-sm font-bold">Add New Card</span>
         </button>
         <button 
-           onClick={() => navigate('/pack-designer')}
+           onClick={() => setShowNewSetDialog(true)}
            className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
         >
           <span className="material-symbols-outlined text-3xl">add</span>
         </button>
       </div>
+
+      {/* New Set Dialog */}
+      {showNewSetDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-panel-dark rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-bold mb-4">Create New Set</h2>
+            
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                  Set Name
+                </label>
+                <input
+                  type="text"
+                  value={newSetName}
+                  onChange={(e) => setNewSetName(e.target.value)}
+                  placeholder="e.g., Core Set"
+                  className="w-full rounded-lg bg-slate-100 dark:bg-white/5 border border-black/10 dark:border-white/10 p-3 text-base focus:border-primary focus:ring-primary outline-none transition-all"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+                  Target Card Count
+                </label>
+                <input
+                  type="number"
+                  value={newSetTarget}
+                  onChange={(e) => setNewSetTarget(e.target.value)}
+                  placeholder="100"
+                  className="w-full rounded-lg bg-slate-100 dark:bg-white/5 border border-black/10 dark:border-white/10 p-3 text-base focus:border-primary focus:ring-primary outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowNewSetDialog(false);
+                  setNewSetName('');
+                  setNewSetTarget('100');
+                }}
+                className="flex-1 px-4 py-3 rounded-lg border border-black/10 dark:border-white/10 font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateSet}
+                disabled={!newSetName.trim()}
+                className="flex-1 px-4 py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Nav */}
       <footer className="flex gap-2 border-t border-zinc-200 dark:border-zinc-800 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md px-4 pb-4 pt-2 fixed bottom-0 w-full z-10">
