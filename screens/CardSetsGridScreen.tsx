@@ -75,6 +75,13 @@ const CardSetsGridScreen: React.FC = () => {
         <h1 className="text-zinc-900 dark:text-white text-lg font-bold leading-tight flex-1 text-center">My Card Sets</h1>
         <div className="flex items-center justify-end gap-2">
           <button 
+            onClick={() => navigate('/bulk-editor')}
+            className="flex items-center justify-center h-10 px-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+            title="Bulk Editor"
+          >
+            <span className="material-symbols-outlined text-xl">table_chart</span>
+          </button>
+          <button 
             onClick={() => {
               if (cards.length === 0) {
                 alert('Create some cards first!');
